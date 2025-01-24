@@ -81,8 +81,7 @@ graph TD
 
 ### Prerequisites
 - Node.js (v18 or higher)
-- MongoDB (v6.0 or higher)
-- Redis (v7.0 or higher)
+- Docker and Docker Compose
 - AWS Account with appropriate IAM permissions
 - Hugging Face API Key
 
@@ -98,13 +97,7 @@ graph TD
    npm install
    ```
 
-3. **Set Up Local Services:**
-   ```bash
-   # Start MongoDB and Redis using Docker
-   docker-compose up -d
-   ```
-
-4. **Set Up Environment Variables:**
+3. **Set Up Environment Variables:**
    Create a `.env` file in the root directory:
    ```env
    # App
@@ -113,7 +106,8 @@ graph TD
 
    # Database
    MONGODB_URI=mongodb://localhost:27017/hf-business
-   REDIS_URL=redis://localhost:6379
+   REDIS_URL=redis://:devpassword@localhost:6379
+   REDIS_PASSWORD=devpassword
 
    # Authentication
    JWT_SECRET=your-jwt-secret
@@ -128,6 +122,33 @@ graph TD
    AWS_SECRET_ACCESS_KEY=your-aws-secret-access-key
    ```
 
+4. **Start Local Services:**
+   The project uses Docker Compose to manage local development services (MongoDB and Redis).
+   ```bash
+   # Start services in detached mode
+   docker-compose up -d
+
+   # Verify services are running
+   docker-compose ps
+
+   # View service logs
+   docker-compose logs -f
+
+   # Stop services
+   docker-compose down
+
+   # Stop services and remove volumes
+   docker-compose down -v
+   ```
+
+   **Service Details:**
+   - MongoDB runs on `localhost:27017`
+     - Database name: `hf-business`
+     - No authentication required for local development
+   - Redis runs on `localhost:6379`
+     - Protected with password (default: `devpassword`)
+     - Persistence enabled with AOF (Append-Only File)
+
 5. **Run Development Server:**
    ```bash
    # Start development server with hot reload
@@ -136,6 +157,35 @@ graph TD
 
 6. **Access the Application:**
    Open your browser and navigate to `http://localhost:3000`
+
+### Troubleshooting Local Services
+
+1. **Check Service Status:**
+   ```bash
+   # View service status
+   docker-compose ps
+
+   # View service logs
+   docker-compose logs mongodb
+   docker-compose logs redis
+   ```
+
+2. **Reset Services:**
+   ```bash
+   # Stop services and remove containers
+   docker-compose down
+
+   # Remove volumes if you want to clear all data
+   docker volume rm hf-business-mongodb-data hf-business-redis-data
+
+   # Restart services
+   docker-compose up -d
+   ```
+
+3. **Common Issues:**
+   - If MongoDB fails to start, ensure port 27017 is not in use
+   - If Redis fails to start, ensure port 6379 is not in use
+   - If services are unhealthy, check logs for specific errors
 
 ### Production Deployment
 1. **Build the Application:**
