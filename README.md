@@ -176,7 +176,7 @@ graph TD
    docker-compose down
 
    # Remove volumes if you want to clear all data
-   docker volume rm hf-business-mongodb-data hf-business-redis-data
+   docker-compose down -v
 
    # Restart services
    docker-compose up -d
@@ -186,6 +186,76 @@ graph TD
    - If MongoDB fails to start, ensure port 27017 is not in use
    - If Redis fails to start, ensure port 6379 is not in use
    - If services are unhealthy, check logs for specific errors
+
+### Testing Local Services
+
+1. **Verify Services are Running:**
+   ```bash
+   # Check running containers and their health status
+   docker ps
+   ```
+   Expected output should show both containers running and "healthy"
+
+2. **Test MongoDB Connection:**
+   ```bash
+   # Connect to MongoDB container
+   docker exec -it hf-business-mongodb mongosh
+   
+   # Once connected, test the database
+   show dbs
+   use hf-business
+   db.version()
+   
+   # Create a test document
+   db.test.insertOne({ message: "Hello MongoDB" })
+   db.test.find()
+   
+   # Exit MongoDB shell
+   exit
+   ```
+
+3. **Test Redis Connection:**
+   ```bash
+   # Connect to Redis container
+   docker exec -it hf-business-redis redis-cli
+   
+   # Authenticate (using default password)
+   auth devpassword
+   
+   # Test connection
+   ping
+   
+   # Test data operations
+   set test "Hello Redis"
+   get test
+   
+   # Exit Redis CLI
+   exit
+   ```
+
+4. **View Service Logs:**
+   ```bash
+   # View MongoDB logs
+   docker logs hf-business-mongodb
+   
+   # View Redis logs
+   docker logs hf-business-redis
+   
+   # Follow logs in real-time (add -f flag)
+   docker logs -f hf-business-mongodb
+   docker logs -f hf-business-redis
+   ```
+
+5. **Expected Results:**
+   - MongoDB:
+     - Should connect without authentication
+     - Database operations should work
+     - No connection errors in logs
+   - Redis:
+     - Should authenticate with password
+     - PING should return PONG
+     - Data operations should work
+     - No connection errors in logs
 
 ### Production Deployment
 1. **Build the Application:**
