@@ -98,7 +98,14 @@ graph TD
    ```
 
 3. **Set Up Environment Variables:**
-   Create a `.env` file in the root directory:
+   The project uses environment variables for configuration. These are not tracked in git for security reasons.
+
+   ```bash
+   # Copy the example environment file
+   cp .env.example .env
+   ```
+
+   Then edit `.env` with your specific values:
    ```env
    # App
    PUBLIC_APP_URL=http://localhost:3000
@@ -110,8 +117,8 @@ graph TD
    REDIS_PASSWORD=devpassword
 
    # Authentication
-   JWT_SECRET=your-jwt-secret
-   JWT_REFRESH_SECRET=your-refresh-secret
+   JWT_SECRET=your-jwt-secret          # Change this!
+   JWT_REFRESH_SECRET=your-refresh-secret  # Change this!
    
    # External Services
    HUGGING_FACE_API_KEY=your-hugging-face-api-key
@@ -121,6 +128,12 @@ graph TD
    AWS_ACCESS_KEY_ID=your-aws-access-key-id
    AWS_SECRET_ACCESS_KEY=your-aws-secret-access-key
    ```
+
+   **Important Security Notes:**
+   - Never commit `.env` file to version control
+   - Generate strong secrets for JWT tokens
+   - Keep your API keys secure
+   - In production, use a secure secrets management service
 
 4. **Start Local Services:**
    The project uses Docker Compose to manage local development services (MongoDB and Redis).
