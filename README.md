@@ -323,3 +323,168 @@ This project is licensed under the MIT License. See the [LICENSE](LICENSE) file 
 
 ## Contact
 For any questions or support, please connect with Guillermo Arria-Devoe on [LinkedIn](https://www.linkedin.com/in/guillearria/).
+
+## API Documentation
+
+### Authentication Endpoints
+
+#### Register a New User
+```bash
+POST /api/auth/register
+Content-Type: application/json
+
+{
+  "email": "user@example.com",
+  "password": "Password123",
+  "firstName": "John",
+  "lastName": "Doe"
+}
+```
+
+**Response:**
+```json
+{
+  "accessToken": "jwt_access_token",
+  "refreshToken": "jwt_refresh_token",
+  "user": {
+    "id": "user_id",
+    "email": "user@example.com",
+    "firstName": "John",
+    "lastName": "Doe",
+    "role": "user"
+  }
+}
+```
+
+#### Login
+```bash
+POST /api/auth/login
+Content-Type: application/json
+
+{
+  "email": "user@example.com",
+  "password": "Password123"
+}
+```
+
+**Response:**
+```json
+{
+  "accessToken": "jwt_access_token",
+  "refreshToken": "jwt_refresh_token",
+  "user": {
+    "id": "user_id",
+    "email": "user@example.com",
+    "firstName": "John",
+    "lastName": "Doe",
+    "role": "user"
+  }
+}
+```
+
+#### Refresh Token
+```bash
+POST /api/auth/refresh
+Content-Type: application/json
+
+{
+  "refreshToken": "jwt_refresh_token"
+}
+```
+
+**Response:**
+```json
+{
+  "accessToken": "new_jwt_access_token",
+  "refreshToken": "new_jwt_refresh_token"
+}
+```
+
+### Protected Endpoints
+
+All protected endpoints require an Authorization header with a Bearer token:
+```bash
+Authorization: Bearer jwt_access_token
+```
+
+#### Get Models
+```bash
+GET /api/models
+Authorization: Bearer jwt_access_token
+```
+
+**Response:**
+```json
+[
+  {
+    "id": "model_id",
+    "name": "Model Name",
+    "description": "Model Description",
+    "task": "text-generation",
+    "huggingFaceId": "model-id",
+    "metrics": {},
+    "createdAt": "2024-01-24T00:00:00.000Z",
+    "updatedAt": "2024-01-24T00:00:00.000Z"
+  }
+]
+```
+
+#### Create Model (Admin Only)
+```bash
+POST /api/models
+Authorization: Bearer jwt_access_token
+Content-Type: application/json
+
+{
+  "name": "Model Name",
+  "description": "Model Description",
+  "task": "text-generation",
+  "huggingFaceId": "model-id"
+}
+```
+
+**Response:**
+```json
+{
+  "id": "model_id",
+  "name": "Model Name",
+  "description": "Model Description",
+  "task": "text-generation",
+  "huggingFaceId": "model-id",
+  "metrics": {},
+  "createdAt": "2024-01-24T00:00:00.000Z",
+  "updatedAt": "2024-01-24T00:00:00.000Z"
+}
+```
+
+### Authentication Flow
+
+1. **Registration/Login:**
+   - User registers or logs in
+   - Receives access token (15m expiry) and refresh token (7d expiry)
+
+2. **Using Protected Endpoints:**
+   - Include access token in Authorization header
+   - If token expires, use refresh token to get new tokens
+
+3. **Token Refresh:**
+   - When access token expires, use refresh token to get new pair
+   - Refresh tokens are rotated (old one becomes invalid)
+   - Maximum of 5 refresh tokens per user
+
+### Error Responses
+
+- **401 Unauthorized:**
+  - No token provided
+  - Invalid token
+  - Token expired
+
+- **403 Forbidden:**
+  - Insufficient permissions (non-admin accessing admin endpoints)
+
+- **409 Conflict:**
+  - User already exists (registration)
+  - Model already exists (model creation)
+
+- **500 Internal Server Error:**
+  - Server-side errors
