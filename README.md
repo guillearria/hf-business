@@ -80,7 +80,7 @@ graph TD
 ## Getting Started
 
 ### Prerequisites
-- Node.js (v18 or higher)
+- Node.js (^18.0.0 || ^20.0.0 || >=22)
 - Docker and Docker Compose
 - AWS Account with appropriate IAM permissions
 - Hugging Face API Key
@@ -108,7 +108,7 @@ graph TD
    Then edit `.env` with your specific values:
    ```env
    # App
-   PUBLIC_APP_URL=http://localhost:3000
+   PUBLIC_APP_URL=http://localhost:5173
    NODE_ENV=development
 
    # Database
@@ -164,12 +164,15 @@ graph TD
 
 5. **Run Development Server:**
    ```bash
-   # Start development server with hot reload
+   # Start development server and open in browser
+   npm run dev -- --open
+
+   # Or start without opening browser
    npm run dev
    ```
 
 6. **Access the Application:**
-   Open your browser and navigate to `http://localhost:3000`
+   Open your browser and navigate to `http://localhost:5173`
 
 ### Troubleshooting Local Services
 
