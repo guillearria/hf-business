@@ -2,11 +2,16 @@ import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { Model } from '$lib/models/Model';
 import { getRedisConnection } from '$lib/db/redis';
+import { requireAuth } from '$lib/auth/middleware';
 
 const CACHE_KEY = 'models:all';
 const CACHE_TTL = 60 * 5; // 5 minutes
 
-export const GET: RequestHandler = async () => {
+export const GET: RequestHandler = async (event) => {
+	// Check authentication
+	const authResponse = await requireAuth(event);
+	if (authResponse) return authResponse;
+	
 	try {
 		// Try to get from cache first
 		const redis = await getRedisConnection();
@@ -32,9 +37,17 @@ export const GET: RequestHandler = async () => {
 	}
 };
 
-export const POST: RequestHandler = async ({ request }) => {
+export const POST: RequestHandler = async (event) => {
+	// Check authentication and admin role
+	const authResponse = await requireAuth(event);
+	if (authResponse) return authResponse;
+	
+	if (event.locals.user?.role !== 'admin') {
+		return new Response('Forbidden - Admin access required', { status: 403 });
+	}
+	
 	try {
-		const modelData = await request.json();
+		const modelData = await event.request.json();
 		
 		// Create new model
 		const model = new Model(modelData);
